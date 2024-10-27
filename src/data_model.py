@@ -16,8 +16,8 @@ class Camera:
     cy: float
     sensor_size_x_mm: float
     sensor_size_y_mm: float
-    image_size_x: int
-    image_size_y: int
+    image_size_x_px: int
+    image_size_y_px: int
 
 @dataclass
 class DatasetSpec:

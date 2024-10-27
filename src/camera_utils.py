@@ -49,8 +49,8 @@ def compute_image_footprint_on_surface(camera: Camera, distance_from_surface: fl
     Returns:
         np.ndarray: [footprint_x, footprint_y] in meters.
     """
-    X = (camera.image_size_x * distance_from_surface) / camera.fx
-    Y = (camera.image_size_y * distance_from_surface) / camera.fy
+    X = (camera.image_size_x_px * distance_from_surface) / camera.fx
+    Y = (camera.image_size_y_px * distance_from_surface) / camera.fy
 
     return np.array([X, Y], dtype=np.float32) 
 
@@ -64,9 +64,9 @@ def compute_ground_sampling_distance(camera: Camera, distance_from_surface: floa
     Returns:
         float: the GSD in meters (smaller among x and y directions).
     """
-    X = (camera.image_size_x * distance_from_surface) / camera.fx
-    Y  = (camera.image_size_y * distance_from_surface) / camera.fy
-    return min((X / camera.image_size_x), (Y / camera.image_size_y))
+    X = (camera.image_size_x_px * distance_from_surface) / camera.fx
+    Y  = (camera.image_size_y_px * distance_from_surface) / camera.fy
+    return min((X / camera.image_size_x_px), (Y / camera.image_size_y_px))
 
 def reproject_image_point_to_world(camera: Camera, point: np.ndarray, distance: float) -> np.ndarray:
     """Compute the reprojected point a 2d projected image point and the distance from the surface.

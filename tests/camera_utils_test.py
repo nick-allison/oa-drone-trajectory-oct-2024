@@ -3,6 +3,7 @@ from copy import deepcopy
 
 import numpy as np
 
+import common
 from common import TEST_CAMERA
 import src.camera_utils as camera_utils
 
