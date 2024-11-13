@@ -31,6 +31,9 @@ class DatasetSpec:
     scan_dimension_y: float
     exposure_time_ms: float
 
+    #gimbal_angle_x: float
+    #gimbal_angle_y: float
+
 
 @dataclass
 class Waypoint:

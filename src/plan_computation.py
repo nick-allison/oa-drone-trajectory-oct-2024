@@ -18,20 +18,24 @@ def compute_distance_between_images(camera: Camera, dataset_spec: DatasetSpec) -
         float: The distance between images in the horizontal direction.
         float: The distance between images in the vertical direction.
     """
+    
+    try:
+        footprint = compute_image_footprint_on_surface(camera, dataset_spec.height)
 
-    x = None
-    y = None
+        if dataset_spec.overlap >= 0 and dataset_spec.overlap <= 1:
+            x = (1 - dataset_spec.overlap) * footprint[0]
+        else:
+            raise Exception("Invalid Camera Overlap")
 
-    #Make it only do this if error conditions don't happen to make things faster if I have time
-    footprint = compute_image_footprint_on_surface(camera, dataset_spec.height)
+        if dataset_spec.sidelap >= 0 and dataset_spec.sidelap <= 1:
+            y = (1 - dataset_spec.sidelap) * footprint[1]
+        else:
+            raise Exception("Invalid Camera Sidelap")
 
-    if dataset_spec.overlap >= 0 and dataset_spec.overlap <= 1:
-        x = (1 - dataset_spec.overlap) * footprint[0]
-
-    if dataset_spec.sidelap >= 0 and dataset_spec.sidelap <= 1:
-        y = (1 - dataset_spec.sidelap) * footprint[1]
-
-    return np.array([x, y] , dtype=np.float32)
+        return np.array([x, y] , dtype=np.float32)
+    
+    except Exception as e:
+        print("Error: " + str(e))
 
 def compute_speed_during_photo_capture(camera: Camera, dataset_spec: DatasetSpec, allowed_movement_px: float = 1) -> float:
     """Compute the speed of drone during an active photo capture to prevent more than 1px of motion blur.
@@ -44,7 +48,10 @@ def compute_speed_during_photo_capture(camera: Camera, dataset_spec: DatasetSpec
     Returns:
         float: The speed at which the drone should move during photo capture.
     """
-    raise NotImplementedError()
+    gsd = compute_ground_sampling_distance(camera, dataset_spec.height)
+    ms = dataset_spec.exposure_time_ms
+    return ((gsd * 1000) / ms) * allowed_movement_px #coorect would be to divide ms by 1000 to get seconds, 
+    #but this is equivalent and I want to make it hard for the floats to get really small.
 
 
 def generate_photo_plan_on_grid(camera: Camera, dataset_spec: DatasetSpec) -> T.List[Waypoint]:
