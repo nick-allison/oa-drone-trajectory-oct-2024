@@ -65,4 +65,60 @@ def generate_photo_plan_on_grid(camera: Camera, dataset_spec: DatasetSpec) -> T.
         List[Waypoint]: scan plan as a list of waypoints.
 
     """
-    raise NotImplementedError()
+    way_point_list = []
+
+    max_speed = compute_speed_during_photo_capture(camera=camera, dataset_spec=dataset_spec)
+    dist_x, dist_y = compute_distance_between_images(camera=camera, dataset_spec=dataset_spec)
+    
+    if dataset_spec.scan_dimension_x % dist_x == 0:
+        x_points = int(dataset_spec.scan_dimension_x //dist_x)
+    else:
+        x_points = int(dataset_spec.scan_dimension_x //dist_x) + 1
+
+    if dataset_spec.scan_dimension_y % dist_y == 0:
+        y_points = int(dataset_spec.scan_dimension_y //dist_y)
+    else:
+        y_points = int(dataset_spec.scan_dimension_y // dist_y) + 1
+
+    x_len = dataset_spec.scan_dimension_x / x_points
+    y_len = dataset_spec.scan_dimension_y / y_points
+
+    for j in range(y_points + 1):
+        if j % 2 == 0:
+            for i in range(x_points + 1):
+                way_point_list.append(Waypoint(x_pos = i * x_len, 
+                                               y_pos = j * y_len,
+                                               z_pos=dataset_spec.height,
+                                               max_speed=max_speed))
+        else:
+            for i in range(x_points, -1, -1):
+                way_point_list.append(Waypoint(x_pos = i * x_len, 
+                                               y_pos = j * y_len,
+                                               z_pos=dataset_spec.height,
+                                               max_speed=max_speed))
+                
+    return(way_point_list)
+
+"""
+def compute_time(waypoint_list, max_acc, max_vel):
+    times = []
+    for i in range(len(waypoint_list)):
+        y_dist = waypoint_list[i].y_pos - waypoint_list[i + 1].y_pos
+        x_dist = waypoint_list[i].x_pos - waypoint_list[i + 1].x_pos
+        euc_dist = np.sqrt(y_dist **2 + x_dist ** 2)
+
+        final_vel = (euc_dist * max_acc) + waypoint_list[i].max_speed **2
+        if final_vel > max_vel:
+            final_vel = max_vel
+
+            delta_vel = final_vel - waypoint_list[i].max_speed
+            triangle_secs = delta_vel / max_acc
+            triangle_area = triangle_secs * delta_vel
+            dist_cov = (final_vel + waypoint_list[i].max_speed) * triangle_secs
+            dist_to_go = euc_dist - dist_cov
+            square_secs = dist_to_go / 
+
+
+        else:
+            times.append((final_vel - waypoint_list[i].max_speed) * ((euc_dist) / (final_vel + waypoint_list[i].max_speed)))
+            """
