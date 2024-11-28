@@ -99,26 +99,30 @@ def generate_photo_plan_on_grid(camera: Camera, dataset_spec: DatasetSpec) -> T.
                 
     return(way_point_list)
 
-"""
+
 def compute_time(waypoint_list, max_acc, max_vel):
-    times = []
-    for i in range(len(waypoint_list)):
-        y_dist = waypoint_list[i].y_pos - waypoint_list[i + 1].y_pos
-        x_dist = waypoint_list[i].x_pos - waypoint_list[i + 1].x_pos
-        euc_dist = np.sqrt(y_dist **2 + x_dist ** 2)
+    total_time = 0
+    for i in range(len(waypoint_list) - 1):
+        y_dist = waypoint_list[i + 1].y_pos - waypoint_list[i].y_pos
+        x_dist = waypoint_list[i + 1].x_pos - waypoint_list[i].x_pos
+        euc_dist = np.sqrt(y_dist**2 + x_dist**2)
 
-        final_vel = (euc_dist * max_acc) + waypoint_list[i].max_speed **2
-        if final_vel > max_vel:
-            final_vel = max_vel
+        initial_vel = waypoint_list[i].max_speed
+        final_vel = min(np.sqrt(initial_vel**2 + 2 * max_acc * euc_dist), max_vel)
 
-            delta_vel = final_vel - waypoint_list[i].max_speed
-            triangle_secs = delta_vel / max_acc
-            triangle_area = triangle_secs * delta_vel
-            dist_cov = (final_vel + waypoint_list[i].max_speed) * triangle_secs
-            dist_to_go = euc_dist - dist_cov
-            square_secs = dist_to_go / 
+        delta_vel = final_vel - initial_vel
+        accel_time = delta_vel / max_acc
+        accel_dist = (initial_vel + final_vel) / 2 * accel_time
 
-
+        if accel_dist < euc_dist:
+            cruise_dist = euc_dist - accel_dist
+            cruise_time = cruise_dist / final_vel
         else:
-            times.append((final_vel - waypoint_list[i].max_speed) * ((euc_dist) / (final_vel + waypoint_list[i].max_speed)))
-            """
+            accel_time = np.sqrt(2 * euc_dist / max_acc)
+            cruise_time = 0
+
+        segment_time = accel_time + cruise_time
+        total_time += segment_time
+        print(f"Time for segment {i}: {segment_time:.2f} seconds")
+
+    return total_time
