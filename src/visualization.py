@@ -8,13 +8,7 @@ import plotly.graph_objects as go
 
 from src.data_model import Waypoint
 
-def compute_segment_time(
-    start_wp: Waypoint,
-    end_wp: Waypoint,
-    max_acc: float,
-    max_speed: float,
-    photo_speed: float,
-) -> float:
+def compute_segment_time(start_wp: Waypoint, end_wp: Waypoint, max_acc: float, max_speed: float, photo_speed: float) -> float:
     """Compute the time for a segment, incorporating motion blur constraints.
 
     Args:
@@ -34,7 +28,7 @@ def compute_segment_time(
     euc_dist = np.sqrt(x_dist**2 + y_dist**2 + z_dist**2)
 
     initial_speed = start_wp.max_speed
-    cruise_speed = min(max_speed, photo_speed)  # Constrain speed by photo capture requirements
+    cruise_speed = min(max_speed, photo_speed)
     final_speed = min(np.sqrt(initial_speed**2 + 2 * max_acc * euc_dist), cruise_speed)
 
     accel_time = (final_speed - initial_speed) / max_acc
@@ -50,13 +44,7 @@ def compute_segment_time(
     return accel_time + cruise_time
 
 
-def plot_photo_plan(
-    waypoints: T.List[Waypoint],
-    image_footprint_size: np.array,
-    max_acc: float,
-    max_speed: float,
-    photo_speed: float,
-):
+def plot_photo_plan(waypoints: T.List[Waypoint], image_footprint_size: np.array, max_acc: float, max_speed: float, photo_speed: float):
     """Plot the photo plan on a 2D grid.
 
     Args:
